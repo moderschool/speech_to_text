@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronounce Pro | iOS Pronunciation Master</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* iOS Design System */
+        :root {
+            /* iOS Color Palette */
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
+            --ios-purple: #AF52DE;
+            --ios-gray-1: #8E8E93;
+            --ios-gray-2: #AEAEB2;
+            --ios-gray-3: #C7C7CC;
+            --ios-gray-4: #D1D1D6;
+            --ios-gray-5: #E5E5EA;
+            --ios-gray-6: #F2F2F7;
+            --ios-dark-bg: #000000;
+            --ios-dark-surface: #1C1C1E;
+            --ios-dark-surface-2: #2C2C2E;
+            --ios-dark-surface-3: #3A3A3C;
+            
+            /* Typography */
+            --ios-font-sf: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
+            --ios-font-sf-mono: 'SF Mono', 'Monaco', 'Menlo', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: var(--ios-font-sf);
+            background: var(--ios-dark-bg);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* iOS Status Bar */
+        .ios-status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 30px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 600;
+            background: rgba(28, 28, 30, 0.9);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .ios-time {
+            letter-spacing: -0.2px;
+        }
+        
+        .ios-status-icons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        /* Main Container */
+        .ios-main {
+            max-width: 430px;
+            margin: 60px auto 20px;
+            background: var(--ios-dark-surface);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            min-height: calc(100vh - 80px);
+        }
+        
+        /* Header */
+        .ios-header {
+            padding: 40px 30px 30px;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(145deg, #1C1C1E 0%, #2C2C2E 100%);
+        }
+        
+        .app-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--ios-purple) 0%, var(--ios-blue) 100%);
+            border-radius: 18px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(175, 82, 222, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+        
+        .app-icon i {
+            font-size: 32px;
+            color: white;
+            z-index: 1;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #A0A0A0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .app-subtitle {
+            font-size: 16px;
+            color: var(--ios-gray-1);
+            font-weight: 400;
+        }
+        
+        /* Tab Bar */
+        .ios-tab-bar {
+            display: flex;
+            background: var(--ios-dark-surface-2);
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .ios-tab {
+            flex: 1;
+            padding: 18px 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ios-gray-1);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .ios-tab.active {
+            color: white;
+        }
+        
+        .ios-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: var(--ios-blue);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .ios-tab i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+        
+        /* Content Area */
+        .ios-content {
+            padding: 30px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+        
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards */
+        .ios-card {
+            background: var(--ios-dark-surface-2);
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 0.5px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--ios-gray-1);
+            margin-bottom: 20px;
+        }
+        
+        /* Pronunciation Dictionary */
+        .dict-word {
+            background: var(--ios-dark-surface-3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .dict-word:hover {
+            background: var(--ios-dark-surface-3);
+            transform: translateX(5px);
+        }
+        
+        .word-info {
+            flex: 1;
+        }
+        
+        .word-text {
+            font-size: 17px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .word-pronunciation {
+            font-family: var(--ios-font-sf-mono);
+            font-size: 14px;
+            color: var(--ios-green);
+        }
+        
+        .word-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Controls */
+        .ios-control {
+            background: var(--ios-dark-surface-3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: none;
+            color: white;
+            font-size: 16px;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .ios-control:active {
+            background: var(--ios-dark-surface-3);
+            transform: scale(0.98);
+        }
+        
+        .control-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .control-text {
+            flex: 1;
+        }
+        
+        .control-label {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .control-subtext {
+            font-size: 13px;
+            color: var(--ios-gray-1);
+            margin-top: 2px;
+        }
+        
+        .control-right {
+            color: var(--ios-gray-2);
+            font-size: 14px;
+        }
+        
+        /* Pronunciation Visualizer */
+        .visualizer-container {
+            background: var(--ios-dark-surface-3);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 25px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .visualizer-title {
+            font-size: 14px;
+            color: var(--ios-gray-1);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .visualizer {
+            display: flex;
+            align-items: flex-end;
+            height: 120px;
+            gap: 3px;
+            margin: 20px 0;
+        }
+        
+        .frequency-bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--ios-purple), var(--ios-blue));
+            min-height: 10px;
+            border-radius: 3px 3px 0 0;
+            transition: height 0.1s ease;
+        }
+        
+        .pronunciation-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .metric {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--ios-green);
+            margin-bottom: 4px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: var(--ios-gray-1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Record Button */
+        .record-button {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--ios-red) 0%, var(--ios-orange) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 59, 48, 0.4);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .record-button:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+        
+        .record-button i {
+            font-size: 26px;
+            color: white;
+        }
+        
+        .record-button.recording {
+            background: linear-gradient(135deg, var(--ios-green) 0%, #2ca84e 100%);
+            box-shadow: 0 10px 30px rgba(52, 199, 89, 0.4);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(52, 199, 89, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+        }
+        
+        /* Pronunciation Analysis */
+        .analysis-result {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(175, 82, 222, 0.1));
+            border-radius: 14px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(0, 122, 255, 0.2);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .result-score {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .result-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* SSML Editor */
+        .ssml-editor {
+            background: var(--ios-dark-surface-3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: var(--ios-font-sf-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--ios-green);
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Toast Notifications */
+        .ios-toast {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--ios-dark-surface-2);
+            padding: 15px 25px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .ios-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--ios-green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toast-icon i {
+            font-size: 14px;
+            color: white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .ios-main {
+                margin: 60px 20px 20px;
+                border-radius: 14px;
+            }
+            
+            .ios-header {
+                padding: 30px 20px 25px;
+            }
+            
+            .ios-content {
+                padding: 20px;
+            }
+            
+            .pronunciation-metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- iOS Status Bar -->
+    <div class="ios-status-bar">
+        <div class="ios-time" id="currentTime">9:41</div>
+        <div class="ios-status-icons">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full"></i>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="ios-main">
+        <!-- Header -->
+        <div class="ios-header">
+            <div class="app-icon">
+                <i class="fas fa-volume-up"></i>
+            </div>
+            <h1>Pronounce Pro</h1>
+            <div class="app-subtitle">Master Pronunciation with AI</div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="ios-tab-bar">
+            <div class="ios-tab active" data-tab="dictionary">
+                <i class="fas fa-book"></i>
+                Dictionary
+            </div>
+            <div class="ios-tab" data-tab="speak">
+                <i class="fas fa-microphone"></i>
+                Speak
+            </div>
+            <div class="ios-tab" data-tab="train">
+                <i class="fas fa-brain"></i>
+                Train
+            </div>
+            <div class="ios-tab" data-tab="analyze">
+                <i class="fas fa-chart-line"></i>
+                Analyze
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="ios-content">
+            <!-- Dictionary Section -->
+            <div class="content-section active" id="dictionary">
+                <div class="ios-card">
+                    <div class="card-header">
+                        <div class="card-title">Pronunciation Dictionary</div>
+                        <button class="ios-control" style="width: auto; padding: 8px 16px;" onclick="addNewWord()">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="card-subtitle">Manage custom pronunciations for specific words</div>
+                    
+                    <div id="dictionaryWords">
+                        <!-- Words will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="ios-card">
+                    <div class="card-title">Quick Add Common Words</div>
+                    <div class="card-subtitle" style="margin-bottom: 15px;">Tap to add to your dictionary</div>
+                    
+                    <div class="quick-words">
+                        <button class="ios-control" onclick="addQuickWord('data', '/ˈdeɪtə/')">
+                            <div class="control-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="control-text">
+                                <div class="control-label">data</div>
+                                <div class="control-subtext">DAY-tuh or DA-tuh</div>
+                            </div>
+                            <div class="control-right">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                        </button>
+                        
+                        <button class="ios-control" onclick="addQuickWord('tomato', '/təˈmeɪtoʊ/')">
+                            <div class="control-icon">
+                                <i class="fas fa-apple-alt"></i>
+                            </div>
+                            <div class="control-text">
+                                <div class="control-label">tomato</div>
+                                <div class="control-subtext">tuh-MAY-toh or tuh-MAH-toh</div>
+                            </div>
+                            <div class="control-right">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                        </button>
+                        
+                        <button class="ios-control" onclick="addQuickWord('either', '/ˈiːðər/')">
+                            <div class="control-icon">
+                                <i class="fas fa-random"></i>
+                            </div>
+                            <div class="control-text">
+                                <div class="control-label">either</div>
+                                <div class="control-subtext">EE-ther or EYE-ther</div>
+                            </div>
+                            <div class="control-right">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Speak Section -->
+            <div class="content-section" id="speak">
+                <div class="ios-card">
+                    <div class="card-title">Text to Speak</div>
+                    <textarea id="textToSpeak" style="width: 100%; min-height: 120px; background: var(--ios-dark-surface-3); border: none; border-radius: 10px; padding: 15px; color: white; font-size: 16px; margin-top: 15px;" placeholder="Enter text to speak with controlled pronunciation...">The data shows remarkable results when processed through TensorFlow.js</textarea>
+                    
+                    <div class="pronunciation-metrics" style="margin-top: 20px;">
+                        <div class="metric">
+                            <div class="metric-value" id="pitchScore">85%</div>
+                            <div class="metric-label">Pitch</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="stressScore">92%</div>
+                            <div class="metric-label">Stress</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value" id="clarityScore">88%</div>
+                            <div class="metric-label">Clarity</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visualizer-container">
+                    <div class="visualizer-title">Pronunciation Visualizer</div>
+                    <div class="visualizer" id="speechVisualizer">
+                        <!-- Bars will be generated here -->
+                    </div>
+                </div>
+
+                <div class="ios-card">
+                    <div class="card-title">Speech Controls</div>
+                    <button class="ios-control" onclick="generateSSML()">
+                        <div class="control-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="control-text">
+                            <div class="control-label">Generate SSML</div>
+                            <div class="control-subtext">Create precise speech markup</div>
+                        </div>
+                        <div class="control-right">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </button>
+                    
+                    <button class="ios-control" onclick="speakWithPronunciation()">
+                        <div class="control-icon">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                        <div class="control-text">
+                            <div class="control-label">Speak with Control</div>
+                            <div class="control-subtext">Apply pronunciation rules</div>
+                        </div>
+                        <div class="control-right">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </button>
+                    
+                    <button class="ios-control" onclick="downloadAudio()">
+                        <div class="control-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="control-text">
+                            <div class="control-label">Download Audio</div>
+                            <div class="control-subtext">Save as MP3 file</div>
+                        </div>
+                        <div class="control-right">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Train Section -->
+            <div class="content-section" id="train">
+                <div class="ios-card">
+                    <div class="card-title">Pronunciation Training</div>
+                    <div class="card-subtitle">Improve your pronunciation with guided exercises</div>
+                    
+                    <div class="training-exercises">
+                        <button class="ios-control" onclick="startWordTraining()">
+                            <div class="control-icon" style="background: rgba(52, 199, 89, 0.2);">
+                                <i class="fas fa-spell-check" style="color: var(--ios-green);"></i>
+                            </div>
+                            <div class="control-text">
+                                <div class="control-label">Word Practice</div>
+                                <div class="control-subtext">Master individual words</div>
+                            </div>
+                            <div class="control-right">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </button>
+                        
+                        <button class="ios-control" onclick="startSentenceTraining()">
+                            <div class="control-icon" style="background: rgba(0, 122, 255, 0.2);">
+                                <i class="fas fa-comment-alt" style="color: var(--ios-blue);"></i>
+                            </div>
+                            <div class="control-text">
+                                <div class="control-label">Sentence Practice</div>
+                                <div class="control-subtext">Practice full sentences</div>
+                            </div>
+                            <div class="control-right">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </button>
+                        
+                        <button class="ios-control" onclick="startAccentTraining()">
+                            <div class="control-icon" style="background: rgba(175, 82, 222, 0.2);">
+                                <i class="fas fa-globe-americas" style="color: var(--ios-purple);"></i>
+                            </div>
+                            <div class="control-text">
+                                <div class="control-label">Accent Training</div>
+                                <div class="control-subtext">Learn different accents</div>
+                            </div>
+                            <div class="control-right">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="ios-card">
+                    <div class="card-title">Training Progress</div>
+                    <div class="progress-stats">
+                        <div style="margin: 20px 0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span>Accuracy</span>
+                                <span id="accuracyPercent">78%</span>
+                            </div>
+                            <div style="height: 8px; background: var(--ios-dark-surface-3); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 78%; height: 100%; background: linear-gradient(90deg, var(--ios-green), var(--ios-blue)); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span>Fluency</span>
+                                <span id="fluencyPercent">85%</span>
+                            </div>
+                            <div style="height: 8px; background: var(--ios-dark-surface-3); border-radius: 4px; overflow: hidden;">
+                                <div style="width: 85%; height: 100%; background: linear-gradient(90deg, var(--ios-blue), var(--ios-purple)); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analyze Section -->
+            <div class="content-section" id="analyze">
+                <div class="ios-card">
+                    <div class="card-title">Real-time Analysis</div>
+                    <div class="card-subtitle">Analyze your pronunciation as you speak</div>
+                    
+                    <div class="visualizer-container">
+                        <div class="visualizer-title">Live Speech Analysis</div>
+                        <div class="visualizer" id="liveVisualizer">
+                            <!-- Live bars will be generated here -->
+                        </div>
+                        
+                        <div class="pronunciation-metrics" id="liveMetrics">
+                            <!-- Live metrics will be updated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-result">
+                    <div class="result-header">
+                        <div>
+                            <div style="font-size: 14px; color: var(--ios-gray-1);">Last Analysis</div>
+                            <div class="card-title" style="margin-top: 5px;">"Hello World"</div>
+                        </div>
+                        <div class="result-score">92%</div>
+                    </div>
+                    <div class="result-text">
+                        Good pronunciation! Your stress patterns and intonation are excellent. 
+                        Consider working on vowel length consistency.
+                    </div>
+                </div>
+
+                <div class="ios-card">
+                    <div class="card-title">Detailed Analysis</div>
+                    <div class="ssml-editor" id="ssmlOutput">
+&lt;speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"&gt;
+  &lt;voice name="en-US-Wavenet-D"&gt;
+    &lt;prosody rate="medium" pitch="+2%"&gt;
+      Hello &lt;emphasis level="strong"&gt;World&lt;/emphasis&gt;!
+    &lt;/prosody&gt;
+  &lt;/voice&gt;
+&lt;/speak&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Record Button -->
+    <button class="record-button" id="recordButton">
+        <i class="fas fa-microphone"></i>
+    </button>
+
+    <!-- Toast Notification -->
+    <div class="ios-toast" id="toast">
+        <div class="toast-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="toast-text">Word added to dictionary!</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://unpkg.com/@tensorflow-models/speech-commands@latest/dist/speech-commands.min.js"></script>
+    <script>
+        class PronounceProApp {
+            constructor() {
+                this.pronunciationDictionary = {};
+                this.isListening = false;
+                this.recognition = null;
+                this.currentTab = 'dictionary';
+                this.isModelLoaded = false;
+                this.visualizerInterval = null;
+                
+                this.initializeApp();
+            }
+            
+            initializeApp() {
+                this.initializeTime();
+                this.loadDictionary();
+                this.setupTabs();
+                this.setupVisualizers();
+                this.setupSpeechRecognition();
+                this.initializeTensorFlow();
+                this.setupEventListeners();
+            }
+            
+            initializeTime() {
+                const updateTime = () => {
+                    const now = new Date();
+                    let hours = now.getHours();
+                    let minutes = now.getMinutes();
+                    minutes = minutes < 10 ? '0' + minutes : minutes;
+                    hours = hours > 12 ? hours - 12 : hours;
+                    hours = hours === 0 ? 12 : hours;
+                    document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+                };
+                updateTime();
+                setInterval(updateTime, 60000);
+            }
+            
+            loadDictionary() {
+                // Load saved dictionary from localStorage
+                const savedDict = localStorage.getItem('pronunciationDictionary');
+                if (savedDict) {
+                    this.pronunciationDictionary = JSON.parse(savedDict);
+                } else {
+                    // Default dictionary
+                    this.pronunciationDictionary = {
+                        'data': { pronunciation: '/ˈdeɪtə/', ipa: 'ˈdeɪtə', alternatives: ['DAY-tuh', 'DA-tuh'] },
+                        'tomato': { pronunciation: '/təˈmeɪtoʊ/', ipa: 'təˈmeɪtoʊ', alternatives: ['tuh-MAY-toh', 'tuh-MAH-toh'] },
+                        'either': { pronunciation: '/ˈiːðər/', ipa: 'ˈiːðər', alternatives: ['EE-ther', 'EYE-ther'] },
+                        'route': { pronunciation: '/ruːt/', ipa: 'ruːt', alternatives: ['ROOT', 'ROWT'] },
+                        'nuclear': { pronunciation: '/ˈnjuːkliər/', ipa: 'ˈnjuːkliər', alternatives: ['NOO-klee-er'] }
+                    };
+                }
+                this.renderDictionary();
+            }
+            
+            renderDictionary() {
+                const container = document.getElementById('dictionaryWords');
+                container.innerHTML = '';
+                
+                Object.entries(this.pronunciationDictionary).forEach(([word, data]) => {
+                    const wordElement = document.createElement('div');
+                    wordElement.className = 'dict-word';
+                    wordElement.innerHTML = `
+                        <div class="word-info">
+                            <div class="word-text">${word}</div>
+                            <div class="word-pronunciation">${data.pronunciation}</div>
+                        </div>
+                        <div class="word-actions">
+                            <button onclick="app.speakWord('${word}')" style="background: none; border: none; color: var(--ios-blue); font-size: 20px; cursor: pointer;">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <button onclick="app.removeWord('${word}')" style="background: none; border: none; color: var(--ios-red); font-size: 20px; cursor: pointer;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(wordElement);
+                });
+            }
+            
+            setupTabs() {
+                document.querySelectorAll('.ios-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.dataset.tab;
+                        this.switchTab(tabId);
+                    });
+                });
+            }
+            
+            switchTab(tabId) {
+                this.currentTab = tabId;
+                
+                // Update active tab
+                document.querySelectorAll('.ios-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === tabId);
+                });
+                
+                // Update content sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.toggle('active', section.id === tabId);
+                });
+                
+                // Update visualizers based on tab
+                if (tabId === 'analyze') {
+                    this.startLiveVisualizer();
+                } else {
+                    this.stopLiveVisualizer();
+                }
+            }
+            
+            setupVisualizers() {
+                // Create speech visualizer bars
+                const speechVisualizer = document.getElementById('speechVisualizer');
+                const liveVisualizer = document.getElementById('liveVisualizer');
+                
+                for (let i = 0; i < 40; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'frequency-bar';
+                    bar.style.height = `${Math.random() * 80 + 20}px`;
+                    speechVisualizer.appendChild(bar);
+                }
+                
+                for (let i = 0; i < 40; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'frequency-bar';
+                    bar.style.height = `${Math.random() * 80 + 20}px`;
+                    liveVisualizer.appendChild(bar);
+                }
+                
+                // Animate speech visualizer
+                this.animateVisualizer('speechVisualizer');
+            }
+            
+            animateVisualizer(visualizerId) {
+                const bars = document.querySelectorAll(`#${visualizerId} .frequency-bar`);
+                setInterval(() => {
+                    bars.forEach(bar => {
+                        const currentHeight = parseFloat(bar.style.height);
+                        const newHeight = Math.max(20, Math.min(100, currentHeight + (Math.random() * 20 - 10)));
+                        bar.style.height = `${newHeight}px`;
+                    });
+                }, 100);
+            }
+            
+            startLiveVisualizer() {
+                const bars = document.querySelectorAll('#liveVisualizer .frequency-bar');
+                this.liveVisualizerInterval = setInterval(() => {
+                    bars.forEach(bar => {
+                        const newHeight = Math.random() * 100 + 10;
+                        bar.style.height = `${newHeight}px`;
+                    });
+                    
+                    // Update live metrics
+                    this.updateLiveMetrics();
+                }, 50);
+            }
+            
+            stopLiveVisualizer() {
+                if (this.liveVisualizerInterval) {
+                    clearInterval(this.liveVisualizerInterval);
+                }
+            }
+            
+            updateLiveMetrics() {
+                const metrics = document.getElementById('liveMetrics');
+                metrics.innerHTML = `
+                    <div class="metric">
+                        <div class="metric-value">${Math.floor(Math.random() * 20 + 80)}%</div>
+                        <div class="metric-label">Clarity</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${Math.floor(Math.random() * 30 + 70)}%</div>
+                        <div class="metric-label">Pitch</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${Math.floor(Math.random() * 25 + 75)}%</div>
+                        <div class="metric-label">Rhythm</div>
+                    </div>
+                `;
+            }
+            
+            setupSpeechRecognition() {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                
+                if (SpeechRecognition) {
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = true;
+                    this.recognition.lang = 'en-US';
+                    
+                    this.recognition.onstart = () => {
+                        this.isListening = true;
+                        document.getElementById('recordButton').classList.add('recording');
+                        this.showToast('Listening...', 'info');
+                    };
+                    
+                    this.recognition.onresult = (event) => {
+                        let transcript = '';
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            if (event.results[i].isFinal) {
+                                transcript += event.results[i][0].transcript;
+                            }
+                        }
+                        
+                        if (transcript) {
+                            this.analyzePronunciation(transcript);
+                        }
+                    };
+                    
+                    this.recognition.onend = () => {
+                        this.isListening = false;
+                        document.getElementById('recordButton').classList.remove('recording');
+                    };
+                    
+                    this.recognition.onerror = (event) => {
+                        console.error('Speech recognition error:', event.error);
+                        this.showToast(`Error: ${event.error}`, 'error');
+                    };
+                }
+            }
+            
+            async initializeTensorFlow() {
+                try {
+                    // Initialize TensorFlow.js
+                    await tf.ready();
+                    this.isModelLoaded = true;
+                    console.log('TensorFlow.js loaded successfully');
+                    
+                    // In a real application, you would load speech models here
+                    // const model = await speechCommands.create('BROWSER_FFT');
+                    // await model.ensureModelLoaded();
+                    
+                } catch (error) {
+                    console.error('Failed to initialize TensorFlow:', error);
+                    this.showToast('Using browser speech recognition', 'info');
+                }
+            }
+            
+            setupEventListeners() {
+                // Record button
+                document.getElementById('recordButton').addEventListener('click', () => {
+                    this.toggleRecording();
+                });
+                
+                // Update scores periodically
+                setInterval(() => {
+                    this.updateScores();
+                }, 3000);
+            }
+            
+            toggleRecording() {
+                if (!this.recognition) {
+                    this.showToast('Speech recognition not available', 'error');
+                    return;
+                }
+                
+                if (this.isListening) {
+                    this.recognition.stop();
+                } else {
+                    this.recognition.start();
+                }
+            }
+            
+            addNewWord() {
+                const word = prompt('Enter the word:');
+                if (!word) return;
+                
+                const pronunciation = prompt('Enter pronunciation (IPA or phonetic):', '/ˈdeɪtə/');
+                if (!pronunciation) return;
+                
+                this.pronunciationDictionary[word.toLowerCase()] = {
+                    pronunciation: pronunciation,
+                    ipa: pronunciation.replace(/[\/]/g, ''),
+                    alternatives: [pronunciation]
+                };
+                
+                this.saveDictionary();
+                this.renderDictionary();
+                this.showToast(`Added "${word}" to dictionary`, 'success');
+            }
+            
+            addQuickWord(word, pronunciation) {
+                this.pronunciationDictionary[word.toLowerCase()] = {
+                    pronunciation: pronunciation,
+                    ipa: pronunciation.replace(/[\/]/g, ''),
+                    alternatives: [pronunciation]
+                };
+                
+                this.saveDictionary();
+                this.renderDictionary();
+                this.showToast(`Added "${word}" to dictionary`, 'success');
+            }
+            
+            removeWord(word) {
+                if (confirm(`Remove "${word}" from dictionary?`)) {
+                    delete this.pronunciationDictionary[word];
+                    this.saveDictionary();
+                    this.renderDictionary();
+                    this.showToast(`Removed "${word}"`, 'info');
+                }
+            }
+            
+            saveDictionary() {
+                localStorage.setItem('pronunciationDictionary', 
+                    JSON.stringify(this.pronunciationDictionary));
+            }
+            
+            speakWord(word) {
+                const data = this.pronunciationDictionary[word];
+                if (data) {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    
+                    // Try to apply pronunciation hints
+                    if (data.ipa) {
+                        // In a real app, you would use SSML with phoneme tags
+                        // For demo, we'll just speak the word
+                    }
+                    
+                    speechSynthesis.speak(utterance);
+                }
+            }
+            
+            generateSSML() {
+                const text = document.getElementById('textToSpeak').value;
+                let ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">\n`;
+                ssml += `  <voice name="en-US-Wavenet-D">\n`;
+                ssml += `    <prosody rate="medium" pitch="+2%">\n`;
+                
+                // Apply pronunciation rules from dictionary
+                let processedText = text;
+                Object.entries(this.pronunciationDictionary).forEach(([word, data]) => {
+                    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                    if (regex.test(text)) {
+                        processedText = processedText.replace(regex, 
+                            `<phoneme alphabet="ipa" ph="${data.ipa}">${word}</phoneme>`);
+                    }
+                });
+                
+                ssml += `      ${processedText}\n`;
+                ssml += `    </prosody>\n`;
+                ssml += `  </voice>\n`;
+                ssml += `</speak>`;
+                
+                document.getElementById('ssmlOutput').textContent = ssml;
+                this.showToast('SSML generated successfully', 'success');
+                this.switchTab('analyze');
+            }
+            
+            speakWithPronunciation() {
+                const text = document.getElementById('textToSpeak').value;
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Get available voices
+                const voices = speechSynthesis.getVoices();
+                const usVoice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+                
+                if (usVoice) {
+                    utterance.voice = usVoice;
+                }
+                
+                // Apply some pronunciation control through rate and pitch
+                utterance.rate = 0.9; // Slightly slower for clarity
+                utterance.pitch = 1.1; // Slightly higher pitch
+                
+                speechSynthesis.speak(utterance);
+                this.showToast('Speaking with pronunciation control', 'info');
+            }
+            
+            analyzePronunciation(text) {
+                // In a real app, this would use TensorFlow.js for analysis
+                // For demo, we'll simulate analysis
+                
+                const score = Math.floor(Math.random() * 20 + 75); // 75-95%
+                const analysisResult = document.querySelector('.analysis-result');
+                
+                analysisResult.innerHTML = `
+                    <div class="result-header">
+                        <div>
+                            <div style="font-size: 14px; color: var(--ios-gray-1);">Analysis Result</div>
+                            <div class="card-title" style="margin-top: 5px;">"${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"</div>
+                        </div>
+                        <div class="result-score">${score}%</div>
+                    </div>
+                    <div class="result-text">
+                        ${this.getFeedback(score)}<br><br>
+                        <strong>Detected words:</strong> ${text.toLowerCase().split(' ').slice(0, 5).join(', ')}
+                    </div>
+                `;
+                
+                this.showToast(`Analysis complete: ${score}%`, 'success');
+            }
+            
+            getFeedback(score) {
+                if (score >= 90) return 'Excellent pronunciation! Perfect intonation and clarity.';
+                if (score >= 80) return 'Very good! Minor adjustments could improve clarity.';
+                if (score >= 70) return 'Good effort! Consider practicing stress patterns.';
+                return 'Keep practicing! Focus on vowel sounds and intonation.';
+            }
+            
+            updateScores() {
+                // Simulate score updates
+                document.getElementById('pitchScore').textContent = 
+                    `${Math.floor(Math.random() * 15 + 80)}%`;
+                document.getElementById('stressScore').textContent = 
+                    `${Math.floor(Math.random() * 15 + 85)}%`;
+                document.getElementById('clarityScore').textContent = 
+                    `${Math.floor(Math.random() * 15 + 75)}%`;
+                
+                // Update progress percentages
+                document.getElementById('accuracyPercent').textContent = 
+                    `${Math.floor(Math.random() * 20 + 70)}%`;
+                document.getElementById('fluencyPercent').textContent = 
+                    `${Math.floor(Math.random() * 20 + 75)}%`;
+            }
+            
+            showToast(message, type = 'info') {
+                const toast = document.getElementById('toast');
+                const icon = toast.querySelector('.toast-icon i');
+                
+                // Set icon based on type
+                if (type === 'success') {
+                    toast.querySelector('.toast-icon').style.background = 'var(--ios-green)';
+                    icon.className = 'fas fa-check';
+                } else if (type === 'error') {
+                    toast.querySelector('.toast-icon').style.background = 'var(--ios-red)';
+                    icon.className = 'fas fa-exclamation';
+                } else {
+                    toast.querySelector('.toast-icon').style.background = 'var(--ios-blue)';
+                    icon.className = 'fas fa-info';
+                }
+                
+                toast.querySelector('.toast-text').textContent = message;
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+            
+            startWordTraining() {
+                this.showToast('Starting word training exercise', 'info');
+                this.switchTab('speak');
+                document.getElementById('textToSpeak').value = 'data, tomato, either, route, nuclear';
+            }
+            
+            startSentenceTraining() {
+                this.showToast('Starting sentence training', 'info');
+                this.switchTab('speak');
+                document.getElementById('textToSpeak').value = 'The quick brown fox jumps over the lazy dog while processing data through TensorFlow.js';
+            }
+            
+            startAccentTraining() {
+                this.showToast('Starting accent training', 'info');
+                // This would switch to accent-specific training
+            }
+            
+            downloadAudio() {
+                this.showToast('Audio download simulated', 'info');
+                // In a real app, this would generate and download audio
+            }
+        }
+        
+        // Initialize the app
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new PronounceProApp();
+            
+            // Load voices for speech synthesis
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = () => {
+                    console.log('Voices loaded');
+                };
+            }
+        });
+        
+        // Make app globally available for onclick handlers
+        window.app = app;
+    </script>
+</body>
+</html>
